@@ -151,7 +151,9 @@ static void do_boot(struct boot_rsp *rsp)
      */
 #ifdef CONFIG_BOOT_RAM_LOAD
     /* Get ram address for image */
+    BOOT_LOG_WRN(">>> A");
     vt = (struct arm_vector_table *)(rsp->br_hdr->ih_load_addr + rsp->br_hdr->ih_hdr_size);
+    BOOT_LOG_WRN(">>> A1 %p", vt);
 #else
     uintptr_t flash_base;
     int rc;
@@ -186,6 +188,8 @@ static void do_boot(struct boot_rsp *rsp)
     z_arm_clear_arm_mpu_config();
 #endif
 
+BOOT_LOG_WRN(">>> B");
+
 #if defined(CONFIG_BUILTIN_STACK_GUARD) && \
     defined(CONFIG_CPU_CORTEX_M_HAS_SPLIM)
     /* Reset limit registers to avoid inflicting stack overflow on image
@@ -199,6 +203,7 @@ static void do_boot(struct boot_rsp *rsp)
     irq_lock();
 #endif /* CONFIG_MCUBOOT_CLEANUP_ARM_CORE */
 
+BOOT_LOG_WRN(">>> C");
 #ifdef CONFIG_BOOT_INTR_VEC_RELOC
 #if defined(CONFIG_SW_VECTOR_RELAY)
     _vector_table_pointer = vt;
@@ -215,12 +220,18 @@ static void do_boot(struct boot_rsp *rsp)
 #endif
 #endif /* CONFIG_BOOT_INTR_VEC_RELOC */
 
+BOOT_LOG_WRN(">>> C1");
     __set_MSP(vt->msp);
+BOOT_LOG_WRN(">>> C2");
 #if CONFIG_MCUBOOT_CLEANUP_ARM_CORE
     __set_CONTROL(0x00); /* application will configures core on its own */
+BOOT_LOG_WRN(">>> C3");
     __ISB();
+BOOT_LOG_WRN(">>> C4");
 #endif
+BOOT_LOG_WRN(">>> D");
     ((void (*)(void))vt->reset)();
+BOOT_LOG_WRN(">>> WUT");
 }
 
 #elif defined(CONFIG_XTENSA) || defined(CONFIG_RISCV)

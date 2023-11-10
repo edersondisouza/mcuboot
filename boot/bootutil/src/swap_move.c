@@ -88,6 +88,7 @@ boot_read_image_header(struct boot_loader_state *state, int slot,
     if (bs && !boot_status_is_reset(bs)) {
 	boot_find_status(BOOT_CURR_IMG(state), &fap);
         if (fap == NULL || boot_read_swap_size(fap, &swap_size)) {
+            BOOT_LOG_WRN("A");
             rc = BOOT_EFLASH;
             goto done;
         }
@@ -118,18 +119,21 @@ boot_read_image_header(struct boot_loader_state *state, int slot,
     area_id = flash_area_id_from_multi_image_slot(BOOT_CURR_IMG(state), slot);
     rc = flash_area_open(area_id, &fap);
     if (rc != 0) {
+        BOOT_LOG_WRN("B %d", rc);
         rc = BOOT_EFLASH;
         goto done;
     }
 
     rc = flash_area_read(fap, off, out_hdr, sizeof *out_hdr);
     if (rc != 0) {
+        BOOT_LOG_WRN("C %d", rc);
         rc = BOOT_EFLASH;
         goto done;
     }
 
     /* We only know where the headers are located when bs is valid */
     if (bs != NULL && out_hdr->ih_magic != IMAGE_MAGIC) {
+        BOOT_LOG_WRN("D %d %d 0x%x", bs != NULL, out_hdr->ih_magic != IMAGE_MAGIC, out_hdr->ih_magic);
         rc = -1;
         goto done;
     }

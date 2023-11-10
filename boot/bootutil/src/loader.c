@@ -97,9 +97,11 @@ boot_read_image_headers(struct boot_loader_state *state, bool require_all,
     for (i = 0; i < BOOT_NUM_SLOTS; i++) {
         rc = BOOT_HOOK_CALL(boot_read_image_header_hook, BOOT_HOOK_REGULAR,
                             BOOT_CURR_IMG(state), i, boot_img_hdr(state, i));
+        BOOT_LOG_WRN("rc %d", rc);
         if (rc == BOOT_HOOK_REGULAR)
         {
             rc = boot_read_image_header(state, i, boot_img_hdr(state, i), bs);
+            BOOT_LOG_WRN("2 rc %d", rc);
         }
         if (rc != 0) {
             /* If `require_all` is set, fail on any single fail, otherwise

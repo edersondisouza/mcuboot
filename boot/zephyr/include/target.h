@@ -30,7 +30,7 @@
 /*
  * Sanity check the target support.
  */
-#if (!defined(CONFIG_XTENSA) && !DT_HAS_CHOSEN(zephyr_flash_controller)) || \
+#if (!defined(CONFIG_XTENSA) && (!DT_HAS_CHOSEN(zephyr_flash_controller) && !DT_NODE_EXISTS(DT_INST(0, jedec_spi_nor)))) || \
     (defined(CONFIG_XTENSA) && !DT_NODE_EXISTS(DT_INST(0, jedec_spi_nor)) && \
     !defined(CONFIG_SOC_FAMILY_ESP32)) || \
     !defined(FLASH_ALIGN) ||                  \
