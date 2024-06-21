@@ -728,7 +728,7 @@ config MCUBOOT_DEVICE_SETTINGS
         # Enable flash page layout if available
 	select FLASH_PAGE_LAYOUT if FLASH_HAS_PAGE_LAYOUT
 	# Enable flash_map module as flash I/O back-end
-	select FLASH_MAP
+	select FLASH_MAP if !I2C_FAKE_FLASH
 
 config MCUBOOT_DEVICE_CPU_CORTEX_M0
 	# Hidden selector for Cortex-M0 settings
@@ -749,7 +749,6 @@ config MULTITHREADING
 	default y if BOOT_SERIAL_CDC_ACM #usb driver requires MULTITHREADING
 	default y if BOOT_USB_DFU_GPIO || BOOT_USB_DFU_WAIT
 	default n if SOC_FAMILY_NORDIC_NRF
-	default n if SOC_FAMILY_ESPRESSIF_ESP32 && MCUBOOT
 	default y
 
 config LOG_PROCESS_THREAD
@@ -781,5 +780,14 @@ config MCUBOOT_VERIFY_IMG_ADDRESS
 	  enabled then the only mitigation is serial recovery. This feature can
 	  also be useful when BOOT_DIRECT_XIP is enabled, to ensure that the image
 	  linked at the correct address is loaded.
+
+config I2C_FAKE_FLASH
+    bool "There's no flash, only an I2C device from where a firmware image is read"
+    default n
+    depends on I2C
+    depends on SINGLE_APPLICATION_SLOT
+    help
+      If you have an I2C device that acts as a flash memory, you can enable this
+      option to read the firmware image from it.
 
 source "Kconfig.zephyr"

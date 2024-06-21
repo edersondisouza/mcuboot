@@ -80,7 +80,7 @@ if(DEFINED CONFIG_ENABLE_MGMT_PERUSER)
   endif()
 endif()
 
-if(NOT DEFINED CONFIG_FLASH_PAGE_LAYOUT)
+if(NOT DEFINED CONFIG_FLASH_PAGE_LAYOUT AND NOT DEFINED CONFIG_I2C_FAKE_FLASH)
   zephyr_library_sources(
     flash_map_legacy.c
     )
@@ -361,6 +361,12 @@ endif()
 if(CONFIG_MCUBOOT_BOOT_BANNER)
   # Replace Zephyr's boot banner with the MCUboot one
   zephyr_sources(kernel/banner.c)
+endif()
+
+if(CONFIG_I2C_FAKE_FLASH)
+    zephyr_library_sources(
+        i2c_fake_flash.c
+    )
 endif()
 
 if(SYSBUILD)
