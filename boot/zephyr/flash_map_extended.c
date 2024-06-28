@@ -34,11 +34,20 @@ BOOT_LOG_MODULE_DECLARE(mcuboot);
 #define FLASH_DEVICE_BASE 0
 #define FLASH_DEVICE_NODE DT_CHOSEN(zephyr_flash_controller)
 
+#elif defined(CONFIG_I2C_FAKE_FLASH)
+
+#define FLASH_DEVICE_ID 0
+#define FLASH_DEVICE_BASE 0
+
 #else
 #error "FLASH_DEVICE_ID could not be determined"
 #endif
 
+#if !defined(CONFIG_I2C_FAKE_FLASH)
 static const struct device *flash_dev = DEVICE_DT_GET(FLASH_DEVICE_NODE);
+#else
+static const struct device *flash_dev = NULL;
+#endif
 
 int flash_device_base(uint8_t fd_id, uintptr_t *ret)
 {

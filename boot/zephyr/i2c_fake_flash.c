@@ -4,7 +4,7 @@
 
 #define I2C_ADDR	0x20
 
-static const struct device *const i2c_bus = DEVICE_DT_GET(DT_NODELABEL(i2c0));
+static const struct device *const i2c_bus = DEVICE_DT_GET(DT_ALIAS(i2c0));
 static const struct flash_area area;
 
 static uint8_t data[64];
@@ -84,4 +84,9 @@ int flash_area_open(uint8_t id, const struct flash_area **fa)
 	*fa = &area;
 
 	return 0;
+}
+
+uint32_t flash_area_align(const struct flash_area *fa)
+{
+    return 1;
 }
