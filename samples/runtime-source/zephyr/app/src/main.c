@@ -9,6 +9,7 @@
 
 int main(void)
 {
-	printk("Hello World from %s on %s!\n",
-	       MCUBOOT_HELLO_WORLD_FROM, CONFIG_BOARD);
+	printk("Hello World from %s on %s, slot %s!\n",
+	       MCUBOOT_HELLO_WORLD_FROM, CONFIG_BOARD,
+           DT_PROP(DT_CHOSEN(zephyr_code_partition), label));
 }

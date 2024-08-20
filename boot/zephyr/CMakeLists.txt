@@ -369,13 +369,9 @@ if(CONFIG_MCUBOOT_BOOT_BANNER)
   zephyr_sources(kernel/banner.c)
 endif()
 
-if(CONFIG_AARDVARK_I2C_FLASH)
+if(BUILD_RUNTIME_SOURCE_SAMPLE)
     zephyr_library_sources(
-        ${MCUBOOT_DIR}/samples/non-flash-source/zephyr/aardvark_i2c_flash.c
-        ${MCUBOOT_DIR}/samples/non-flash-source/zephyr/flash_map_dispatcher.c
-    )
-    zephyr_library_include_directories(
-        ${MCUBOOT_DIR}/samples/non-flash-source/zephyr/include
+        ${MCUBOOT_DIR}/samples/runtime-source/zephyr/flash_map_dispatcher.c
     )
 endif()
 

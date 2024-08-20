@@ -6,14 +6,18 @@
 
 #include <flash_map_backend/flash_map_backend.h>
 #include <zephyr/storage/flash_map.h>
+#include <zephyr/drivers/gpio.h>
 
-#include "aardvark_i2c_flash.h"
+#define SW1_NODE        DT_ALIAS(sw1)
+#if DT_NODE_HAS_STATUS(SW1_NODE, okay)
+static struct gpio_dt_spec sw1_spec = GPIO_DT_SPEC_GET(SW1_NODE, gpios);
+#endif
 
 static int curr_idx = -1;
 
 static uint8_t known_ids[] = {
-	-1, /* Just to show a "failing" image. Next one should work */
-	AARDVARK_FLASH_AREA_ID
+	FIXED_PARTITION_ID(slot0_partition),
+	FIXED_PARTITION_ID(slot1_partition),
 };
 
 bool
@@ -21,6 +25,13 @@ flash_map_id_get_next(uint8_t *id, bool reset)
 {
 	if (reset) {
 		curr_idx = 0;
+#if DT_NODE_HAS_STATUS(SW1_NODE, okay)
+		if (gpio_pin_configure_dt(&sw1_spec, GPIO_INPUT) == 0) {
+			if (gpio_pin_get_dt(&sw1_spec) == 1) {
+				curr_idx = 1;
+			}
+		}
+#endif
 	} else {
 		curr_idx++;
 	}
@@ -44,17 +55,4 @@ flash_map_id_get_current(uint8_t *id)
 	*id = known_ids[curr_idx];
 
 	return true;
-}
-
-int
-flash_area_open_custom(uint8_t id, const struct flash_area **fap)
-{
-	switch (id) {
-	case 0:
-		return flash_area_open(id, fap);
-	case AARDVARK_FLASH_AREA_ID:
-		return aardvark_flash_area_open(id, fap);
-	default:
-		return -1;
-	}
 }

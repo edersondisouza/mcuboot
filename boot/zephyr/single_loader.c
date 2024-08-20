@@ -134,7 +134,10 @@ boot_go(struct boot_rsp *rsp)
         reset = false;
         printf("flash_id: %d\n", flash_id);
         rc = flash_area_open(flash_id, &_fa_p);
-        assert(rc == 0);
+        printf("rc: %d\n", rc);
+        if (rc != 0) {
+            continue;
+        }
 
         rc = boot_image_load_header(_fa_p, &_hdr);
         if (rc != 0) {
