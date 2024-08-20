@@ -23,7 +23,7 @@ static struct image_header _hdr = { 0 };
 __weak bool
 flash_map_id_get_next(uint8_t *id, bool reset)
 {
-    if (!reset) {
+    if (!reset || !id) {
         return false;
     }
 
@@ -35,6 +35,10 @@ flash_map_id_get_next(uint8_t *id, bool reset)
 __weak bool
 flash_map_id_get_current(uint8_t *id)
 {
+    if (!id) {
+        return false;
+    }
+
     *id = FLASH_AREA_IMAGE_PRIMARY(0);
 
     return true;
@@ -128,11 +132,13 @@ boot_go(struct boot_rsp *rsp)
 
     while (flash_map_id_get_next(&flash_id, reset)) {
         reset = false;
-        rc = flash_area_open(FLASH_AREA_IMAGE_PRIMARY(0), &_fa_p);
+        printf("flash_id: %d\n", flash_id);
+        rc = flash_area_open(flash_id, &_fa_p);
         assert(rc == 0);
 
         rc = boot_image_load_header(_fa_p, &_hdr);
         if (rc != 0) {
+            printk("boot_image_load_header failed\n");
             flash_area_close(_fa_p);
             continue;
         }
