@@ -17,8 +17,8 @@ static struct gpio_dt_spec sw1_spec = GPIO_DT_SPEC_GET(SW1_NODE, gpios);
 static int curr_idx = -1;
 
 static uint8_t known_ids[] = {
-	FIXED_PARTITION_ID(slot0_partition),
-	FIXED_PARTITION_ID(slot1_partition),
+	FIXED_PARTITION_ID(slot10_partition),
+	FIXED_PARTITION_ID(slot11_partition),
 };
 
 bool

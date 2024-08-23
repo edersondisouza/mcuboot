@@ -1,0 +1,72 @@
+/*
+ * Copyright (c) 2024 Intel Corporation
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+    chosen {
+        zephyr,code-partition = &boot_partition;
+        zephyr,flash-controller = &flash_i2c;
+    };
+
+    flash_i2c: flash-controller@0 {
+        compatible = "aardvark,i2c-flash-controller";
+        reg = <0x0 0x10000>;
+        status = "okay";
+        device = <&i2c_smb_0>;
+
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        flash1: flash@0 {
+            compatible = "soc-nv-flash";
+            reg = <0x0 0x10000>;
+
+            /* These values are dummy to keep the API happy,
+                as the device is read-only */
+            erase-block-size = <64>;
+            write-block-size = <1>;
+
+            partitions {
+                compatible = "fixed-partitions";
+                #address-cells = <1>;
+                #size-cells = <1>;
+
+                slot10_partition: partitions@0 {
+                    label = "slot10";
+                    reg = <0x0 0x4000>;
+                };
+                slot11_partition: partitions@4000 {
+                    label = "slot11";
+                    reg = <0x4000 0x4000>;
+                };
+            };
+        };
+    };
+};
+
+&flash0 {
+    compatible = "soc-nv-flash";
+    write-block-size = <1>;
+
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        boot_partition: partition@0 {
+            label = "boot";
+            reg = <0x0 0x10000>;
+        };
+
+        /* MEC17 pretends flash0 is... flash. It is just the
+         area on RAM from which code is executed. Bringing truth
+         would entail changing it to not believe is XIP and such. For
+         now, play along and use the slot0 as flash.*/
+        slot0_partition: partitions@10000 {
+            label = "slot0";
+            reg = <0x10000 0x48000>;
+        };
+    };
+};
