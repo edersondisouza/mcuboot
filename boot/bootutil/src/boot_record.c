@@ -249,6 +249,8 @@ int boot_save_shared_data(const struct image_header *hdr, const struct flash_are
 #else
     uint8_t mode = MCUBOOT_MODE_DIRECT_XIP;
 #endif
+#elif defined(MCUBOOT_SINGLE_APPLICATION_SLOT_RAM_LOAD)
+    uint8_t mode = MCUBOOT_MODE_SINGLE_SLOT_RAM_LOAD;
 #elif defined(MCUBOOT_RAM_LOAD)
     uint8_t mode = MCUBOOT_MODE_RAM_LOAD;
 #elif defined(MCUBOOT_FIRMWARE_LOADER)
