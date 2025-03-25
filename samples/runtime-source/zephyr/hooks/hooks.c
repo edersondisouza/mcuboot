@@ -28,6 +28,10 @@ static int current_id;
 static struct gpio_dt_spec sw1_spec = GPIO_DT_SPEC_GET(SW1_NODE, gpios);
 #endif
 
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(sram_tag), okay)
+#define SRAM_TAG DT_NODELABEL(sram_tag)
+#endif
+
 fih_ret boot_go_hook(struct boot_rsp *rsp)
 {
 	int rc;
@@ -37,7 +41,8 @@ fih_ret boot_go_hook(struct boot_rsp *rsp)
 	FIH_DECLARE(fih_rc, FIH_FAILURE);
 	const struct flash_area *_fa_p;
 
-	current_id = 0;
+	current_id = -1;
+
 
 #if DT_NODE_HAS_STATUS(SW1_NODE, okay)
 	if (gpio_pin_configure_dt(&sw1_spec, GPIO_INPUT) == 0) {
@@ -45,14 +50,26 @@ fih_ret boot_go_hook(struct boot_rsp *rsp)
 			current_id = ARRAY_SIZE(known_ids) - 1;
 			printk("%s pressed, forcing boot from partition %u\n",
 				   sw1_spec.port->name, known_ids[current_id]);
-		} else {
-			printk("%s not pressed, looping partitions to boot\n",
-				   sw1_spec.port->name);
 		}
 	}
 #else
 	printk("SW1 not defined, looping partitions to boot\n");
 #endif
+
+#ifdef SRAM_TAG
+	uintptr_t sram_tag = DT_REG_ADDR(SRAM_TAG);
+
+	if (*((uint32_t *)sram_tag) == 42) {
+		current_id = ARRAY_SIZE(known_ids) - 1;
+		printk("SRAM tag set to 42, forcing boot from partition %u\n",
+			   known_ids[current_id]);
+	}
+#endif
+
+	if (current_id == -1) {
+		printk("No SRAM tag nor button overwrites, looping partitions to boot\n");
+		current_id = 0;
+	}
 
 	for ( ; current_id < ARRAY_SIZE(known_ids); current_id++) {
 		printk("Trying to boot from fixed partition %u\n",

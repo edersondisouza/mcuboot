@@ -1,0 +1,80 @@
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+    aliases {
+        sw1 = &user_button_1;
+    };
+
+    chosen {
+        zephyr,code-partition = &boot_partition;
+        zephyr,flash-controller = &int_flash;
+    };
+
+    gpio_keys {
+        compatible = "gpio-keys";
+        user_button_1: button_1 {
+            gpios = <&gpio6 3 GPIO_ACTIVE_LOW>;
+            zephyr,code = <INPUT_KEY_0>;
+        };
+    };
+
+    flash_ctrl_dummy: flash_ctrl_dummy {
+        status = "disabled";
+
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        flash0_alt: flash@10060000 {
+            compatible = "soc-nv-flash";
+            reg = <0x10060000 DT_SIZE_K(64)>;
+            write-block-size = <1>;
+
+            partitions {
+                compatible = "fixed-partitions";
+                #address-cells = <1>;
+                #size-cells = <1>;
+
+                boot_partition: partition@0 {
+                    label = "boot";
+                    reg = <0x0 0x10000>;
+                };
+                /* This is not used directly, but mcuboot needs a size for the
+                 * area where an image lives.
+                 */
+                slot0_partition: partition@10000 {
+                    label = "slot0";
+                    reg = <0x10000 0x20000>;
+                };
+            };
+        };
+    };
+
+    sram_tag: memory@100bfc00 {
+        device_type = "memory";
+        label = "sram_tag";
+        reg = <0x100BFC00 DT_SIZE_K(1)>;
+    };
+};
+
+&int_flash {
+    status = "okay";
+
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        slot10_partition: partition@20000 {
+            label = "slot10";
+            reg = <0x20000 0x20000>;
+        };
+        slot11_partition: partition@40000 {
+            label = "slot11";
+            reg = <0x40000 0x60000>;
+        };
+    };
+};
+
+&gpio6 {
+    status = "okay";
+};
