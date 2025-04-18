@@ -1,0 +1,12 @@
+/ {
+    chosen {
+        zephyr,code-partition = &code_partition;
+        mcuboot,ram-load-dev = &sram_code;
+    };
+
+    sram_code: memory@10070000 {
+        device_type = "memory";
+        label = "sram_code";
+        reg = <0x10070000 DT_SIZE_K(320)>;
+    };
+};

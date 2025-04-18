@@ -1,0 +1,51 @@
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+    chosen {
+        zephyr,code-partition = &boot_partition;
+        zephyr,flash-controller = &int_flash;
+    };
+
+    flash_ctrl_dummy: flash_ctrl_dummy {
+        status = "disabled";
+
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        flash0_alt: flash@10060000 {
+            compatible = "soc-nv-flash";
+            reg = <0x10060000 DT_SIZE_K(64)>;
+            write-block-size = <1>;
+
+            partitions {
+                compatible = "fixed-partitions";
+                #address-cells = <1>;
+                #size-cells = <1>;
+
+                boot_partition: partition@0 {
+                    label = "boot";
+                    reg = <0x0 0x10000>;
+                };
+                code_partition: partition@10000 {
+                    label = "code";
+                    reg = <0x10000 0x20000>;
+                };
+            };
+        };
+    };
+};
+
+&int_flash {
+    status = "okay";
+
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        slot0_partition: partition@20000 {
+            label = "slot0";
+            reg = <0x20000 0x20000>;
+        };
+    };
+};
